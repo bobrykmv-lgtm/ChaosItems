@@ -1,0 +1,6 @@
+name: ChaosItems
+version: 1.0.0
+main: com.chaossmp.chaositems.ChaosItems
+api-version: '1.21'
+description: Custom craftable items for ChaosSMP
+author: ChaosSMP
