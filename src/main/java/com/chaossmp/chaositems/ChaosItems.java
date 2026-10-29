@@ -8,6 +8,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -25,11 +26,18 @@ public final class ChaosItems extends JavaPlugin implements Listener {
 
 private NamespacedKey energyKey;
 private NamespacedKey superAppleKey;
+private NamespacedKey energyRecipeKey;
+private NamespacedKey goldenAppleRecipeKey;
+private NamespacedKey superAppleRecipeKey;
 
 @Override
 public void onEnable() {
     energyKey = new NamespacedKey(this, "energy_drink");
     superAppleKey = new NamespacedKey(this, "super_apple");
+
+    energyRecipeKey = new NamespacedKey(this, "energy_recipe");
+    goldenAppleRecipeKey = new NamespacedKey(this, "easy_golden_apple");
+    superAppleRecipeKey = new NamespacedKey(this, "super_apple_recipe");
 
     Bukkit.getPluginManager().registerEvents(this, this);
 
@@ -37,7 +45,24 @@ public void onEnable() {
     registerEasyGoldenAppleRecipe();
     registerSuperAppleRecipe();
 
+    for (Player player : Bukkit.getOnlinePlayers()) {
+        discoverRecipes(player);
+    }
+
     getLogger().info("ChaosItems enabled!");
+}
+
+// ВЫДАЧА ДОСТУПА К РЕЦЕПТАМ
+
+private void discoverRecipes(Player player) {
+    player.discoverRecipe(energyRecipeKey);
+    player.discoverRecipe(goldenAppleRecipeKey);
+    player.discoverRecipe(superAppleRecipeKey);
+}
+
+@EventHandler
+public void onPlayerJoin(PlayerJoinEvent event) {
+    discoverRecipes(event.getPlayer());
 }
 
 // ЭНЕРГЕТИК
@@ -48,6 +73,7 @@ private ItemStack createEnergyDrink() {
 
     meta.setColor(Color.LIME);
     meta.setDisplayName(ChatColor.GREEN + "⚡ Энергетик");
+
     meta.setLore(List.of(
             ChatColor.GRAY + "Напиток ChaosSMP",
             ChatColor.WHITE + "Эффект:",
@@ -65,9 +91,11 @@ private ItemStack createEnergyDrink() {
 }
 
 private void registerEnergyDrinkRecipe() {
-    NamespacedKey key = new NamespacedKey(this, "energy_recipe");
+    ShapedRecipe recipe = new ShapedRecipe(
+            energyRecipeKey,
+            createEnergyDrink()
+    );
 
-    ShapedRecipe recipe = new ShapedRecipe(key, createEnergyDrink());
     recipe.shape(
             " S ",
             "CGR",
@@ -83,13 +111,11 @@ private void registerEnergyDrinkRecipe() {
     Bukkit.addRecipe(recipe);
 }
 
-// УПРОЩЁННЫЙ РЕЦЕПТ ОБЫЧНОГО ЗОЛОТОГО ЯБЛОКА
+// УПРОЩЁННЫЙ РЕЦЕПТ ЗОЛОТОГО ЯБЛОКА
 
 private void registerEasyGoldenAppleRecipe() {
-    NamespacedKey key = new NamespacedKey(this, "easy_golden_apple");
-
     ShapedRecipe recipe = new ShapedRecipe(
-            key,
+            goldenAppleRecipeKey,
             new ItemStack(Material.GOLDEN_APPLE)
     );
 
@@ -137,9 +163,11 @@ private ItemStack createSuperApple() {
 }
 
 private void registerSuperAppleRecipe() {
-    NamespacedKey key = new NamespacedKey(this, "super_apple_recipe");
+    ShapedRecipe recipe = new ShapedRecipe(
+            superAppleRecipeKey,
+            createSuperApple()
+    );
 
-    ShapedRecipe recipe = new ShapedRecipe(key, createSuperApple());
     recipe.shape(
             "GGG",
             "GAG",
@@ -189,6 +217,7 @@ public void onItemConsume(PlayerItemConsumeEvent event) {
                     ChatColor.GREEN
                             + "Вы выпили энергетик! Скорость III на 3 минуты."
             );
+
             return;
         }
     }
