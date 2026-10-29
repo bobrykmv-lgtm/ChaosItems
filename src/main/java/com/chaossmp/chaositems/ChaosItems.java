@@ -52,7 +52,7 @@ public void onEnable() {
     getLogger().info("ChaosItems enabled!");
 }
 
-// ВЫДАЧА ДОСТУПА К РЕЦЕПТАМ
+// ОТКРЫТИЕ РЕЦЕПТОВ В КНИГЕ РЕЦЕПТОВ
 
 private void discoverRecipes(Player player) {
     player.discoverRecipe(energyRecipeKey);
@@ -73,7 +73,6 @@ private ItemStack createEnergyDrink() {
 
     meta.setColor(Color.LIME);
     meta.setDisplayName(ChatColor.GREEN + "⚡ Энергетик");
-
     meta.setLore(List.of(
             ChatColor.GRAY + "Напиток ChaosSMP",
             ChatColor.WHITE + "Эффект:",
@@ -142,14 +141,11 @@ private ItemStack createSuperApple() {
     );
 
     meta.setLore(List.of(
-            ChatColor.DARK_PURPLE + "Легендарный предмет ChaosSMP",
+            ChatColor.DARK_PURPLE + "Особый предмет ChaosSMP",
             "",
-            ChatColor.YELLOW + "Поглощение V — 2 минуты",
-            ChatColor.GREEN + "Регенерация III — 2 минуты",
-            ChatColor.BLUE + "Сопротивление II — 5 минут",
-            ChatColor.RED + "Огнестойкость — 10 минут",
-            ChatColor.DARK_RED + "Сила II — 3 минуты",
-            ChatColor.AQUA + "Скорость II — 3 минуты"
+            ChatColor.GREEN + "Регенерация II — 30 секунд",
+            ChatColor.BLUE + "Сопротивление III — 2 минуты",
+            ChatColor.AQUA + "Скорость II — 1 минута"
     ));
 
     meta.getPersistentDataContainer().set(
@@ -185,6 +181,8 @@ private void registerSuperAppleRecipe() {
 @EventHandler
 public void onItemConsume(PlayerItemConsumeEvent event) {
     ItemStack item = event.getItem();
+
+    // ЭНЕРГЕТИК
 
     if (item.getType() == Material.POTION
             && item.getItemMeta() instanceof PotionMeta meta) {
@@ -222,6 +220,8 @@ public void onItemConsume(PlayerItemConsumeEvent event) {
         }
     }
 
+    // SUPER APPLE
+
     if (item.getType() == Material.GOLDEN_APPLE
             && item.getItemMeta() != null) {
 
@@ -235,20 +235,17 @@ public void onItemConsume(PlayerItemConsumeEvent event) {
             Player player = event.getPlayer();
             consumeOneItem(player, event.getHand());
 
-            player.setFoodLevel(20);
-            player.setSaturation(20);
-
             player.addPotionEffect(new PotionEffect(
-                    PotionEffectType.ABSORPTION,
-                    20 * 120,
-                    4,
+                    PotionEffectType.REGENERATION,
+                    20 * 30,
+                    1,
                     false,
                     true,
                     true
             ));
 
             player.addPotionEffect(new PotionEffect(
-                    PotionEffectType.REGENERATION,
+                    PotionEffectType.RESISTANCE,
                     20 * 120,
                     2,
                     false,
@@ -257,35 +254,8 @@ public void onItemConsume(PlayerItemConsumeEvent event) {
             ));
 
             player.addPotionEffect(new PotionEffect(
-                    PotionEffectType.RESISTANCE,
-                    20 * 300,
-                    1,
-                    false,
-                    true,
-                    true
-            ));
-
-            player.addPotionEffect(new PotionEffect(
-                    PotionEffectType.FIRE_RESISTANCE,
-                    20 * 600,
-                    0,
-                    false,
-                    true,
-                    true
-            ));
-
-            player.addPotionEffect(new PotionEffect(
-                    PotionEffectType.STRENGTH,
-                    20 * 180,
-                    1,
-                    false,
-                    true,
-                    true
-            ));
-
-            player.addPotionEffect(new PotionEffect(
                     PotionEffectType.SPEED,
-                    20 * 180,
+                    20 * 60,
                     1,
                     false,
                     true,
@@ -296,7 +266,7 @@ public void onItemConsume(PlayerItemConsumeEvent event) {
                     ChatColor.GOLD + "" + ChatColor.BOLD
                             + "SUPER APPLE "
                             + ChatColor.GREEN
-                            + "Вы получили все эффекты!"
+                            + "Вы получили три эффекта!"
             );
         }
     }
