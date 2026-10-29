@@ -5,7 +5,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,28 +25,19 @@ public final class ChaosItems extends JavaPlugin implements Listener {
 
 private NamespacedKey energyKey;
 private NamespacedKey superAppleKey;
-private NamespacedKey energyRecipeKey;
-private NamespacedKey superAppleRecipeKey;
 
 @Override
 public void onEnable() {
     energyKey = new NamespacedKey(this, "energy_drink");
     superAppleKey = new NamespacedKey(this, "super_apple");
 
-    energyRecipeKey = new NamespacedKey(this, "energy_recipe");
-    superAppleRecipeKey = new NamespacedKey(this, "super_apple_recipe");
-
     Bukkit.getPluginManager().registerEvents(this, this);
 
     registerEnergyDrinkRecipe();
+    registerEasyGoldenAppleRecipe();
     registerSuperAppleRecipe();
 
     getLogger().info("ChaosItems enabled!");
-}
-
-@Override
-public void onDisable() {
-    getLogger().info("ChaosItems disabled.");
 }
 
 // ЭНЕРГЕТИК
@@ -58,13 +48,10 @@ private ItemStack createEnergyDrink() {
 
     meta.setColor(Color.LIME);
     meta.setDisplayName(ChatColor.GREEN + "⚡ Энергетик");
-
     meta.setLore(List.of(
             ChatColor.GRAY + "Напиток ChaosSMP",
             ChatColor.WHITE + "Эффект:",
-            ChatColor.GREEN + "Скорость III — 3 минуты",
-            "",
-            ChatColor.YELLOW + "Выпей, чтобы ускориться!"
+            ChatColor.GREEN + "Скорость III — 3 минуты"
     ));
 
     meta.getPersistentDataContainer().set(
@@ -78,11 +65,9 @@ private ItemStack createEnergyDrink() {
 }
 
 private void registerEnergyDrinkRecipe() {
-    ShapedRecipe recipe = new ShapedRecipe(
-            energyRecipeKey,
-            createEnergyDrink()
-    );
+    NamespacedKey key = new NamespacedKey(this, "energy_recipe");
 
+    ShapedRecipe recipe = new ShapedRecipe(key, createEnergyDrink());
     recipe.shape(
             " S ",
             "CGR",
@@ -96,7 +81,28 @@ private void registerEnergyDrinkRecipe() {
     recipe.setIngredient('E', Material.EMERALD);
 
     Bukkit.addRecipe(recipe);
-    getLogger().info("Energy drink recipe registered!");
+}
+
+// УПРОЩЁННЫЙ РЕЦЕПТ ОБЫЧНОГО ЗОЛОТОГО ЯБЛОКА
+
+private void registerEasyGoldenAppleRecipe() {
+    NamespacedKey key = new NamespacedKey(this, "easy_golden_apple");
+
+    ShapedRecipe recipe = new ShapedRecipe(
+            key,
+            new ItemStack(Material.GOLDEN_APPLE)
+    );
+
+    recipe.shape(
+            " G ",
+            "GAG",
+            " G "
+    );
+
+    recipe.setIngredient('G', Material.GOLD_INGOT);
+    recipe.setIngredient('A', Material.APPLE);
+
+    Bukkit.addRecipe(recipe);
 }
 
 // SUPER APPLE
@@ -105,7 +111,9 @@ private ItemStack createSuperApple() {
     ItemStack item = new ItemStack(Material.GOLDEN_APPLE);
     ItemMeta meta = item.getItemMeta();
 
-    meta.setDisplayName(ChatColor.GOLD + "" + ChatColor.BOLD + "Super Apple");
+    meta.setDisplayName(
+            ChatColor.GOLD + "" + ChatColor.BOLD + "Super Apple"
+    );
 
     meta.setLore(List.of(
             ChatColor.DARK_PURPLE + "Легендарный предмет ChaosSMP",
@@ -129,11 +137,9 @@ private ItemStack createSuperApple() {
 }
 
 private void registerSuperAppleRecipe() {
-    ShapedRecipe recipe = new ShapedRecipe(
-            superAppleRecipeKey,
-            createSuperApple()
-    );
+    NamespacedKey key = new NamespacedKey(this, "super_apple_recipe");
 
+    ShapedRecipe recipe = new ShapedRecipe(key, createSuperApple());
     recipe.shape(
             "GGG",
             "GAG",
@@ -144,10 +150,9 @@ private void registerSuperAppleRecipe() {
     recipe.setIngredient('A', Material.APPLE);
 
     Bukkit.addRecipe(recipe);
-    getLogger().info("Super Apple recipe registered!");
 }
 
-// ОБРАБОТКА ИСПОЛЬЗОВАНИЯ ПРЕДМЕТОВ
+// ИСПОЛЬЗОВАНИЕ ПРЕДМЕТОВ
 
 @EventHandler
 public void onItemConsume(PlayerItemConsumeEvent event) {
@@ -182,7 +187,7 @@ public void onItemConsume(PlayerItemConsumeEvent event) {
 
             player.sendMessage(
                     ChatColor.GREEN
-                            + "⚡ Вы выпили энергетик! Скорость III на 3 минуты."
+                            + "Вы выпили энергетик! Скорость III на 3 минуты."
             );
             return;
         }
