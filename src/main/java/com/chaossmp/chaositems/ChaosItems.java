@@ -1,4 +1,3 @@
-```java
 package com.chaossmp.chaositems;
 
 import org.bukkit.Bukkit;
@@ -133,4 +132,3 @@ public final class ChaosItems extends JavaPlugin implements Listener {
         );
     }
 }
-```
